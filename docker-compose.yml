@@ -1,0 +1,42 @@
+version: '3.7'
+
+services:
+  web:
+    build: ./HuaweiToDo
+    command: gunicorn HuaweiToDo.wsgi:application --bind 0.0.0.0:8000
+    expose:
+      - 8000
+    volumes:
+      - ./HuaweiToDo/:/usr/src/app/
+      - static_volume:/usr/src/app/staticfiles
+    environment:
+      - DEBUG=1
+      - SECRET_KEY=#=&^n^bq_^a9^4$z*=%9cjnfrprmu7%rj7n@tw14ae2sfm=zw!
+      - SQL_ENGINE=django.db.backends.postgresql
+      - SQL_DATABASE=todo
+      - SQL_USER=postgres
+      - SQL_PASSWORD=postgres
+      - SQL_HOST=db
+      - SQL_PORT=5432
+    depends_on:
+      - db
+  db:
+    image: postgres:11.2
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=todo
+  nginx:
+    build: ./nginx
+    volumes:
+      - static_volume:/usr/src/app/staticfiles
+    ports:
+      - 1337:80
+    depends_on:
+      - web
+
+volumes:
+  postgres_data:
+  static_volume:
