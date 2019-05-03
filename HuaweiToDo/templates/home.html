@@ -31,129 +31,160 @@
             box-shadow: 0 0 0 0px #b93802 inset, 0 0 0 1px rgba(185, 56, 2, 0.15) inset, 0 8px 0 0 #ff1531;
             background-color: #ff4136;
             color: white;
+            font-weight: normal;
+            font-weight: bolder;
         }
         .btn3d-uncomplete {
             box-shadow: 0 0 0 0px #555555 inset, 0 0 0 1px rgba(255, 255, 255, 0.15) inset, 0 8px 0 0 #484848;
             background-color: #484848;
             color: white;
+            font-weight: normal;
+            font-weight: bolder;
         }
         .btn3d-complete {
             box-shadow: 0 0 0 0px #74c8e9 inset, 0 0 0 1px rgba(255, 255, 255, 0.15) inset, 0 8px 0 0 #5fc1e8;
             background-color: #74c8e9;
             color: white;
+            font-weight: normal;
+            font-weight: bolder;
+        }
+        .btn3d-create {
+            box-shadow: 0 0 0 1px #28b62c, 0 4px 0 1px #28b62c;
+            background-color: #ffffff;
+            color: #28b62c;
+            font-weight: normal;
+            font-weight: bolder;
+        }
+        .btn3d-import {
+            box-shadow: 0 0 0 1px #ff851b, 0 4px 0 1px #ff851b;
+            background-color: #ffffff;
+            color: #ff851b;
+            font-weight: normal;
+            font-weight: bolder;
+        }
+        .btn3d-export {
+            box-shadow: 0 0 0 1px #555555, 0 4px 0 1px #555555;
+            background-color: #ffffff;
+            color: #555555;
+            font-weight: normal;
+            font-weight: bolder;
         }
     </style>
 {% endblock %}
 
 {% block content %}
-    <div class="row mt-5">
-        <div class="col">
-            <h1>Todo App</h1>
+    <div class="container">
+        <div class="row mt-5">
+            <div class="col">
+                <h1>Todo App</h1>
+            </div>
         </div>
-    </div>
-    <div class="row mt-2">
-        <div class="col">
-            <p>A Simple Todo App</p>
+        <div class="row mt-2">
+            <div class="col">
+                <p>A Simple Todo App</p>
+            </div>
         </div>
-    </div>
 
-    <div class="row mt-2">
-        <div class="col">
-            <label class="btn btn-outline-success">
-                Create <input type="button" data-toggle="modal" data-target="#createTodo" hidden>
-            </label>
-            <label class="btn btn-outline-warning">
-                Import <input id="importButton" type="file" formenctype="multipart/form-data" hidden>
-            </label>
+        <div class="row mt-2">
+            <div class="col-sm-11 col-md-11 col-lg-11">
+                <label class="btn btn3d-create">
+                    Create <input type="button" data-toggle="modal" data-target="#createTodo" hidden>
+                </label>
+                <label class="btn btn3d-import">
+                    Import <input id="importButton" type="file" formenctype="multipart/form-data" hidden>
+                </label>
+            </div>
+            <div class="col-md-offset-11 col-sm-offset-11 col-lg-offset-11 align-self-end">
+                <label class="btn btn3d-export">
+                    Export <input id="exportButton" type="button" hidden>
+                </label>
+            </div>
         </div>
-        <div class="col align-self-end">
-            <label class="btn btn-outline-dark">
-                Export <input id="exportButton" type="button" hidden>
-            </label>
-        </div>
-    </div>
 
-    <div class="row mt-5">
-        <table id="todoTable" class="table table-hover">
-            <thead>
-            <tr>
-                <th scope="col">User</th>
-                <th scope="col">Todo</th>
-                <th scope="col">Status</th>
-                <th scope="col">Created</th>
-                <th scope="col">Updated</th>
-                <th scope="col">Operation</th>
-            </tr>
-            </thead>
-            {% for todo in todos %}
-                <tr>
-                    <th scope="row">{{ todo.user }}</th>
-                    <td>{{ todo.text }}</td>
-                    <td>
-                        {% if todo.is_completed %}
-                            <span class="completed-text">Completed</span>
+        <div class="row mt-5">
+            <div class="col-sm-12 col-md-12 col-lg-12">
+                <table id="todoTable" class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th scope="col">User</th>
+                        <th scope="col">Todo</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Created</th>
+                        <th scope="col">Updated</th>
+                        <th scope="col">Operation</th>
+                    </tr>
+                    </thead>
+                    {% for todo in todos %}
+                        <tr>
+                            <th scope="row">{{ todo.user }}</th>
+                            <td>{{ todo.text }}</td>
+                            <td>
+                                {% if todo.is_completed %}
+                                    <span class="completed-text">Completed</span>
+                                {% else %}
+                                    <span class="uncompleted-text">Not Completed</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ todo.created_time }}</td>
+                            <td>{{ todo.last_updated }}</td>
+                            <td>
+                                {% if todo.is_completed %}
+                                    <button type="button" class="btn btn3d-uncomplete" data-id  = {{ todo.id }}>Uncomplete</button>
+                                {% else %}
+                                    <button type="button" class="btn btn3d-complete" data-id  = {{ todo.id }}>Complete</button>
+                                {% endif %}
+                                <button type="button" class="btn btn3d-delete" data-id  = {{ todo.id }}>Delete</button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+                {% if todos.has_other_pages %}
+                    <ul class="pagination">
+                        {% if todos.has_previous %}
+                            <li class="page-item"><a class="page-link" href="?page={{ todos.previous_page_number }}">&laquo;</a></li>
                         {% else %}
-                            <span class="uncompleted-text">Not Completed</span>
+                            <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
                         {% endif %}
-                    </td>
-                    <td>{{ todo.created_time }}</td>
-                    <td>{{ todo.last_updated }}</td>
-                    <td>
-                        {% if todo.is_completed %}
-                            <button type="button" class="btn btn3d-uncomplete" data-id  = {{ todo.id }}>Uncomplete</button>
+                        {% for i in todos.paginator.page_range %}
+                            {% if todos.number == i %}
+                                <li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span></li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if todos.has_next %}
+                            <li class="page-item"><a class="page-link" href="?page={{ todos.next_page_number }}">&raquo;</a></li>
                         {% else %}
-                            <button type="button" class="btn btn3d-complete" data-id  = {{ todo.id }}>Complete</button>
+                            <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
                         {% endif %}
-                        <button type="button" class="btn btn3d-delete" data-id  = {{ todo.id }}>Delete</button>
-                    </td>
-                </tr>
-            {% endfor %}
-        </table>
-        {% if todos.has_other_pages %}
-            <ul class="pagination">
-                {% if todos.has_previous %}
-                    <li class="page-item"><a class="page-link" href="?page={{ todos.previous_page_number }}">&laquo;</a></li>
-                {% else %}
-                    <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                    </ul>
                 {% endif %}
-                {% for i in todos.paginator.page_range %}
-                    {% if todos.number == i %}
-                        <li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span></li>
-                    {% else %}
-                        <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
-                    {% endif %}
-                {% endfor %}
-                {% if todos.has_next %}
-                    <li class="page-item"><a class="page-link" href="?page={{ todos.next_page_number }}">&raquo;</a></li>
-                {% else %}
-                    <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
-                {% endif %}
-            </ul>
-        {% endif %}
-    </div>
+            </div>
 
-    <!-- Modal -->
-    <div class="modal fade" id="createTodo" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">New Todo</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="form-group">
-                            <label for="inputTodo">Todo</label>
-                            <input type="text" class="form-control" id="inputTodo" aria-describedby="todoHelp" placeholder="Enter Todo">
-                            <small id="todoHelp" class="form-text text-muted">Type your todo here</small>
+            <!-- Modal -->
+            <div class="modal fade" id="createTodo" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLongTitle">New Todo</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
                         </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button id="addTodo" type="button" class="btn btn-primary">Save changes</button>
+                        <div class="modal-body">
+                            <form>
+                                <div class="form-group">
+                                    <label for="inputTodo">Todo</label>
+                                    <input type="text" class="form-control" id="inputTodo" aria-describedby="todoHelp" placeholder="Enter Todo">
+                                    <small id="todoHelp" class="form-text text-muted">Type your todo here</small>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button id="addTodo" type="button" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

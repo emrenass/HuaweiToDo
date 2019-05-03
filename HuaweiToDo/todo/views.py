@@ -20,3 +20,13 @@ def home(request):
 @login_required
 def statistics(request):
     return render(request, "statistics.html")
+
+@login_required
+def profile(request):
+    user = request.user
+    username = user.username
+    email = user.email
+    date_joined  = user.date_joined
+    return render(request, "profile.html", context={"username": username,
+                                                    "email": email,
+                                                    "date_joined": date_joined})
