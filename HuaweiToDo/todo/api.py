@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
+from django.utils import timezone
 from rest_framework import viewsets, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -51,12 +52,13 @@ def change_status(request):
     if request.user.is_authenticated:
         username = request.user.username
         if obj.user == username:
-            obj.is_completed = not obj.is_completed
-            obj.last_updated = datetime.now()
-            obj.save()
-            serializer = TodoSerializer(obj)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            serializer = TodoSerializer(obj, data={"is_completed": not obj.is_completed,
+                                                   "last_updated": timezone.now()}, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 @login_required
 @api_view(['GET'])

@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase, force_authenticate, APIRequestFactory
+from rest_framework.test import APITestCase, force_authenticate, APIRequestFactory, APIClient
 from rest_framework.utils import json
 
 from .models import Todo
@@ -32,24 +32,57 @@ class UserLoginAPIViewTestCase(APITestCase):
         self.assertTrue(response.context['user'].is_authenticated)
 
 class TodoAPIViewTestCase(APITestCase):
-    url = reverse("create_todo")
+    url_create = reverse("create_todo")
     url_login = reverse("login")
+    url_change_status = reverse("change_status")
+    url_logout = reverse("logout")
 
-    def setUp(self):
-        self.username = "john"
-        self.email = "john@snow.com"
-        self.password = "you_know_nothing"
-        self.user = User.objects.create_user(self.username, self.email, self.password)
-        self.text = "deneme"
-        response = self.client.post(self.url_login, {"username": self.username, "password": self.password}, follow=True)
+    def prepare_csrf_token(self, username, password):
+        self.client.logout()
+        response = self.client.post(self.url_login, {"username": username, "password": password},
+                                    follow=True)
         self.csrf = response.client.cookies['csrftoken']
 
+    def setUp(self):
+        self.client = APIClient()
+        self.username_true = "user1"
+        self.email_true = "user1@me.com"
+        self.password_true = "pass"
+        self.user_true = User.objects.create_user(self.username_true, self.email_true, self.password_true)
+
+        self.username_wrong = "user2"
+        self.email_wrong = "user2@me.com"
+        self.password_wrong = "pass"
+        self.user_wrong = User.objects.create_user(self.username_wrong, self.email_wrong, self.password_wrong)
+        self.text = "deneme"
+
+        self.todo = Todo.objects.create(user=self.username_true, text="deneme")
+
     def test_create_todo_with_valid_data(self):
-        response = self.client.post(self.url, {"text": "deneme"},
+        self.prepare_csrf_token(self.username_true, self.password_true)
+        response = self.client.post(self.url_create, {"text": "deneme"},
                                     headers={'X-CSRFToken': self.csrf})
+
         self.assertEqual(201, response.status_code)
 
     def test_create_todo_with_wrong_data(self):
-        response = self.client.post(self.url, {"user": self.username},
+        self.prepare_csrf_token(self.username_true, self.password_true)
+        response = self.client.post(self.url_create, {"user": self.username_true},
                                     headers={'X-CSRFToken': self.csrf})
         self.assertEqual(400, response.status_code)
+
+    def test_change_todo_status_with_true_user(self):
+        self.prepare_csrf_token(self.username_true, self.password_true)
+        todo = Todo.objects.all().get(user=self.username_true)
+        current_status = todo.is_completed
+        response = self.client.get(self.url_change_status+"?id={}".format(todo.id))
+        self.assertEqual(200, response.status_code)
+        self.assertNotEqual(current_status, response.data["is_completed"])
+
+    def test_change_todo_status_with_wrong_user(self):
+        self.prepare_csrf_token(self.user_wrong, self.password_wrong)
+        todo = Todo.objects.all().get(user=self.username_true)
+        current_status = todo.is_completed
+        response = self.client.get(self.url_change_status+"?id={}".format(todo.id))
+        self.assertEqual(400, response.status_code)
+

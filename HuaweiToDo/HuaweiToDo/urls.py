@@ -25,8 +25,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path('home/', views.home, name='home'),
-    path('statistics/', views.statistics, name='statistics'),
 
+    path('statistics/', views.statistics, name='statistics'),
     path('api/v1/change_status', api.change_status, name='change_status'),
     path('api/v1/create_todo', api.create_todo, name='create_todo'),
     path('api/v1/export', api.export),
