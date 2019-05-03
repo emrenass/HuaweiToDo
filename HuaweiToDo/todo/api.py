@@ -91,6 +91,7 @@ def import_csv(request):
         return Response(serializer.data, status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
+
 @login_required
 @api_view(['GET'])
 def get_statistics(request):

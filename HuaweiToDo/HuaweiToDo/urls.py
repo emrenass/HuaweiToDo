@@ -24,13 +24,13 @@ router = routers.DefaultRouter()
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('home/', views.home, name='home'),
+    path('', views.home, name='home'),
 
     path('statistics/', views.statistics, name='statistics'),
     path('api/v1/change_status', api.change_status, name='change_status'),
     path('api/v1/create_todo', api.create_todo, name='create_todo'),
     path('api/v1/export', api.export),
-    path('api/v1/delete', api.delete),
+    path('api/v1/delete', api.delete, name='delete'),
     path('api/v1/import', api.import_csv),
-    path('api/v1/get_statistics', api.get_statistics),
+    path('api/v1/get_statistics', api.get_statistics, name='get_statics'),
 ]
