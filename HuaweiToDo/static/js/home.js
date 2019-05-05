@@ -28,7 +28,7 @@ $.ajaxSetup({
     },
 });
 
-$("#addTodo").click(function(e) {
+$("#createTodo").submit(function(e) {
     e.preventDefault();
     $.ajax({
         type: "POST",
@@ -75,7 +75,7 @@ $(".btn3d-complete, .btn3d-uncomplete").click(function(e) {
             window.location.reload()
         },
         error: function (data) {
-            alert('error')
+            alert('Not Allowed')
         }
     });
 });
@@ -92,7 +92,7 @@ $(".btn3d-delete").click(function(e) {
             window.location.reload();
         },
         error: function (data) {
-            alert("Error")
+            alert("Not Allowed")
         }
     });
 });

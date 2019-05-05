@@ -1,9 +1,7 @@
-from datetime import datetime
-
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.utils import timezone
-from rest_framework import viewsets, status
+from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 import pandas as pd
@@ -40,7 +38,7 @@ def export(request):
         })
 
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename=filename.csv'
+        response['Content-Disposition'] = 'attachment; filename=todo.csv'
         result.to_csv(path_or_buf=response, sep=';', float_format='%.2f', index=False, decimal=",")
         return response
 
@@ -79,16 +77,18 @@ def delete(request):
 def import_csv(request):
     if request.user.is_authenticated:
         username = request.user.username
-        csv = pd.read_csv(request.FILES["csvFile"], sep=";")
-        csv['Status'] = pd.np.where(csv['Status'].str.lower() == "Completed".lower(), True, False)
-        csv.rename(columns={"Todo": "text", "Status": "is_completed"}, inplace=True)
-        data = csv.to_dict(orient='records')
-        for item in data:
-            item.update({"user": username})
-        serializer = TodoSerializer(data=data, many=True)
-        if serializer.is_valid():
-            serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        file = request.FILES["csvFile"]
+        if file.name.lower().endswith(".csv"):
+            csv = pd.read_csv(request.FILES["csvFile"], sep=";")
+            csv['Status'] = pd.np.where(csv['Status'].str.lower() == "completed", True, False)
+            csv.rename(columns={"Todo": "text", "Status": "is_completed"}, inplace=True)
+            data = csv.to_dict(orient='records')
+            for item in data:
+                item.update({"user": username})
+            serializer = TodoSerializer(data=data, many=True)
+            if serializer.is_valid():
+                serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
