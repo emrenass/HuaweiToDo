@@ -1,6 +1,6 @@
 # HuaweiToDo
 
- - **Docker Installation**
+ 1. **Docker Installation**
 
 	 1. Clone Repo using `git clone https://github.com/emrenass/HuaweiToDo.git
 	 2. Run command docker-compose up --build
@@ -14,7 +14,7 @@
 		> username: user3 password: pass
 	 5. You can access to application from http://127.0.0.1:1337
  
- - **Standalone Installation**
+ 2. **Standalone Installation**
 	 If you do not want to use docker application can run directly with Django's builtin web server.
 	 1. Clone Repo using `git clone https://github.com/emrenass/HuaweiToDo.git
 	 2. Go to HuaweiToDo folder with "cd" command from terminal
@@ -24,7 +24,10 @@
 		 - python mange.py collectstatic
 		 - python manage.py runserver
 
- 2.**Used Technologies**
+ 3. **Backend Deployment Diagram**
+	 ![enter image description here](https://raw.githubusercontent.com/emrenass/HuaweiToDo/master/HuaweiToDo.png)
+
+ 3.**Used Technologies**
  
 	 1. Django with Python3.6
 	 2. Bootstrap (For UI)
@@ -33,7 +36,7 @@
 	 5. Gunicorn (For Server)
 	 6. PostgreSQL (For Database)
 	 7. Jenkins (For testing as CI Tool)
- 3.**Additional Notes**
+ 4.**Additional Notes**
 	 - For import and export functions the application uses semicolon ";" separated csv files.
 
  
