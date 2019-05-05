@@ -1,3 +1,6 @@
+import tempfile
+
+import pandas as pd
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework.test import APITestCase, APIClient
@@ -37,6 +40,7 @@ class TodoAPIViewTestCase(APITestCase):
     url_delete = reverse("delete")
     url_get_statics = reverse("get_statics")
     url_export = reverse("export")
+    url_import = reverse("import")
 
     def prepare_csrf_token(self, username, password):
         self.client.logout()
@@ -133,3 +137,29 @@ class TodoAPIViewTestCase(APITestCase):
         response = self.client.get(self.url_export, follow=True)
         self.assertTrue(response.redirect_chain[0][0].startswith('/accounts/login/'))
 
+    def test_import_with_authenticated(self):
+        self.prepare_csrf_token(self.user1_username, self.user1_password)
+        tmp_file = tempfile.NamedTemporaryFile(suffix='.csv')
+
+        example1_todo_text = "Example1"
+        example2_todo_text = "Example2"
+
+        example1_todo_status = "Not Completed"
+        example2_todo_status = "Completed"
+        sample_csv = pd.DataFrame(data={
+            'Todo': [example1_todo_text, example2_todo_text],
+            'Status': [example1_todo_status, example2_todo_status]
+        })
+        sample_csv.to_csv(tmp_file.name, sep=';')
+        response = self.client.post(self.url_import, {'csvFile': tmp_file}, format='multipart')
+
+        self.assertEqual(201, response.status_code)
+
+        self.assertEquals(response.data[0]["user"], self.user1_username)
+        self.assertEquals(response.data[1]["user"], self.user1_username)
+
+        self.assertEquals(response.data[0]["text"], example1_todo_text)
+        self.assertEquals(response.data[1]["text"], example2_todo_text)
+
+        self.assertEquals(response.data[0]["is_completed"], False)
+        self.assertEquals(response.data[1]["is_completed"], True)
