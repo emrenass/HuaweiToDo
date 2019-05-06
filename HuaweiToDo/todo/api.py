@@ -1,3 +1,10 @@
+"""
+This module contains views for RestAPI, none of these views has templates
+and all of them require authentication in order to execute, they redirect to
+login page otherwise.
+"""
+
+
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.utils import timezone
@@ -13,6 +20,12 @@ from todo.serializers import TodoSerializer
 @login_required
 @api_view(['POST'])
 def create_todo(request):
+    """ This method create new to-do item based
+    on currently logged in user and a to-do text in request
+    :param request:
+    :return: HTTP_201_CODE if to-do created successfully
+            HTTP_400_CODE if to-do could not created successfully
+    """
     if request.user.is_authenticated:
         username = request.user.username
         try:
@@ -28,6 +41,12 @@ def create_todo(request):
 @login_required
 @api_view(['GET'])
 def export(request):
+        """ This method export all to-do items to
+        csv file which is seperated by semicolon ';'
+
+        :param request:
+        :return response: Contains csv file
+        """
         models = list(Todo.objects.all())
         result = pd.DataFrame(data={
             "User": [todo.user for todo in models],
@@ -45,6 +64,15 @@ def export(request):
 @login_required
 @api_view(['GET'])
 def change_status(request):
+    """ This method change current status
+    of to-do item. If item completed then method changes
+    it to not completed, if to-do is not completed it changes
+    to completed
+
+    :param request: takes id of to-do item to change from request
+    :return: Changed to-do item and HTTP_200_CODE if method executed successfully
+            HTTP_400_CODE if method encountered with error.
+    """
     id = request.GET.get('id', '')
     obj = Todo.objects.get(pk=id)
     if request.user.is_authenticated:
@@ -61,6 +89,12 @@ def change_status(request):
 @login_required
 @api_view(['GET'])
 def delete(request):
+    """ This method deletes selected to-do item
+
+    :param request: takes id of to-do item to delete from request
+    :return: Deleted to-do item and HTTP_200_CODE if method executed successfully
+            HTTP_400_CODE if method encountered with error.
+    """
     if request.user.is_authenticated:
         username = request.user.username
         id = request.GET.get('id', '')
@@ -75,6 +109,14 @@ def delete(request):
 @login_required
 @api_view(['POST'])
 def import_csv(request):
+    """ This method creates to-do item
+    from a csv file. Given csv should be seperated by semicolon ';'
+    Csv file taken from request.FILES
+
+    :param request:
+    :return: All to-do items if they created successfully and HTTP_201_CODE
+            HTTP_400_CODE if to-do  items could not created successfully
+    """
     if request.user.is_authenticated:
         username = request.user.username
         file = request.FILES["csvFile"]
@@ -95,6 +137,12 @@ def import_csv(request):
 @login_required
 @api_view(['GET'])
 def get_statistics(request):
+    """ This method calculate total count of
+    both completed and not completed items
+
+    :param request:
+    :return: Dictionary contains counts of completed and not completed item
+    """
     models = list(Todo.objects.all())
     completed_count = 0
     not_completed_count = 0

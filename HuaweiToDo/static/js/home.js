@@ -20,16 +20,8 @@ function csrfSafeMethod(method) {
     // these HTTP methods do not require CSRF protection
     return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
 }
-$.ajaxSetup({
-    beforeSend: function(xhr, settings) {
-        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-            xhr.setRequestHeader("X-CSRFToken", csrftoken);
-        }
-    },
-});
 
-$("#createTodo").submit(function(e) {
-    e.preventDefault();
+function createTodo() {
     $.ajax({
         type: "POST",
         url: "/api/v1/create_todo",
@@ -40,9 +32,26 @@ $("#createTodo").submit(function(e) {
             window.location.reload()
         },
         error: function(result) {
-            alert('error');
+            alert('Error creating ToDo');
         }
     });
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    },
+});
+
+$("#createTodo").submit(function(e) {
+    e.preventDefault();
+    createTodo()
+});
+
+$("#addTodo").click(function(e) {
+    e.preventDefault();
+    createTodo()
 });
 
 $("#exportButton").click(function(e) {

@@ -15,7 +15,7 @@ def home(request):
         todos = paginator.page(1)
     except EmptyPage:
         todos = paginator.page(paginator.num_pages)
-    return render(request, "home.html", context={"todos":todos})
+    return render(request, "home.html", context={"todos": todos})
 
 @login_required
 def statistics(request):
