@@ -47,5 +47,4 @@
  5.**Additional Notes**
 	 - For import and export functions the application uses semicolon ";" separated csv files.
 	 - Jenkins config can be found in this repo
-
- 
+	 - Application tested on Google Chrome

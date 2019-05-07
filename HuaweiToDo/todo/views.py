@@ -6,7 +6,7 @@ from todo.models import Todo
 
 @login_required
 def home(request):
-    models = list(Todo.objects.all())
+    models = list(Todo.objects.all().order_by("created_time"))
     page = request.GET.get('page', 1)
     paginator = Paginator(models, 5)
     try:
